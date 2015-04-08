@@ -10,7 +10,6 @@ import csv
 import unicodecsv
 import math
 import time
-import pprint
 
 def import_dataset(url):
 	"""Return CKAN dataset.
@@ -30,7 +29,6 @@ def import_dataset(url):
 	# Check the contents of the response.
 	assert response_dict['success'] is True
 	result = response_dict['result']
-	#pprint.pprint(result)
 	
 	return result
 
@@ -46,7 +44,8 @@ def get_organization_data(organization):
 	organization_data = import_dataset(url)
 	
 	# Get the data.
-	publisher = {'id': '', 'title': '', 'type': '', 'parent': '', 'homepage': '', 'homepage_for_data': ''}
+	publisher = {'id': '', 'name': '', 'title': '', 'type': '', 'parent': '', 'homepage': '', 'homepage_for_data': ''}
+	publisher['name'] = organization
 	if 'id' in organization_data:
 		publisher['id'] = organization_data['id']
 	if 'title' in organization_data:
@@ -65,11 +64,51 @@ def get_organization_data(organization):
 		publisher['parent'] = parent
 	publisher['homepage'] = 'http://data.gov.uk/publisher/' + organization
 	publisher['homepage_for_data'] = 'http://data.gov.uk/data/search?q=spend&unpublished=false&publisher=' + organization
-	#if 'packages' in organization_data:
-	#	publisher['packages'] = organization_data['packages']
-	#print(publisher)
 	
 	return publisher
+
+def get_sample_organizations():
+	"""Return sample list of publishers."""
+	# Get list of organizations.
+	url = 'http://data.gov.uk/api/3/action/organization_list'
+	print('Get list of organizations...')
+	organization_list = import_dataset(url)
+	print('Sleep 6s...')
+	time.sleep(6)
+	
+	# Get data for each organization.
+	publishers = []
+	print('Get organizations data...')
+	sample = organization_list[0:30]
+	for organization in sample:
+		organization_data = get_organization_data(organization)
+		print('Sleep 6s...')
+		time.sleep(6)
+		publishers.append(organization_data)
+	print(str(len(sample)) + ' publishers')
+	
+	return publishers
+
+def get_all_organizations():
+	"""Return list of publishers."""
+	# Get list of organizations.
+	url = 'http://data.gov.uk/api/3/action/organization_list'
+	print('Get list of organizations...')
+	organization_list = import_dataset(url)
+	print('Sleep 6s...')
+	time.sleep(6)
+	
+	# Get data for each organization.
+	publishers = []
+	print('Get organizations data...')
+	for organization in organization_list:
+		organization_data = get_organization_data(organization)
+		print('Sleep 6s...')
+		time.sleep(6)
+		publishers.append(organization_data)
+	print(str(len(organization_list)) + ' publishers')
+	
+	return publishers
 
 def get_count(url):
 	"""Return number of results.
@@ -91,7 +130,6 @@ def get_count(url):
 		count = response_dict['count']
 	else:
 		count = ''
-	#print(count)
 	
 	return count
 
@@ -124,7 +162,6 @@ def get_results(url_base, query):
 	results = []
 	for i in range(0, pages):
 		url = url_base + 'action/package_search?q=' + query + '&rows=100000&start=' + str(i * 1000)
-		#print(url)
 		result = import_dataset(url)
 		print('Sleep 20s...')
 		time.sleep(20)
@@ -188,11 +225,61 @@ def make_csv(csvfile, fieldnames, dataset):
 	with open(csvfile, 'w') as data:
 		writer = unicodecsv.DictWriter(data, fieldnames=fieldnames)
 		writer.writeheader()
-		for datafile in dataset:
-			writer.writerow(datafile)
+		for element in dataset:
+			writer.writerow(element)
 
-def make_datafiles_csv():
-	"""Make datafiles.csv."""
+def make_publishers_csv_sample(csvfile):
+	"""Make sample publishers csv file."""
+	# Get organizations data
+	publishers = get_sample_organizations()
+	
+	# Make publishers csv file.
+	fieldnames = ['id', 'name', 'title', 'type', 'parent', 'homepage', 'homepage_for_data']
+	print('Make ' + csvfile + '...')
+	make_csv(csvfile, fieldnames, publishers)
+
+def make_publishers_csv(csvfile):
+	"""Make publishers csv file."""
+	# Get organizations data
+	publishers = get_all_organizations()
+	
+	# Make publishers csv file.
+	fieldnames = ['id', 'name', 'title', 'type', 'parent', 'homepage', 'homepage_for_data']
+	print('Make ' + csvfile + '...')
+	make_csv(csvfile, fieldnames, publishers)
+
+def make_datafiles_csv_sample(csvfile):
+	"""Make sample datafiles csv file."""
+	# Get results from http://data.gov.uk/.
+	url_base = 'http://data.gov.uk/api/'
+	print('Get results for q=spend...')
+	results = get_results(url_base, 'spend')
+	
+	# Get sample of datafiles from results.
+	resources = []
+	print('Get datafiles...')
+	first_page = results[0]
+	sample = first_page[0:20]
+	for package in sample:
+		datafiles = []
+		if 'unpublished' in package:
+			if package['unpublished'] != 'true':
+				datafiles = get_datafiles(package)
+				resources += datafiles
+		else:
+			datafiles = get_datafiles(package)
+			resources += datafiles
+	package_count = len(sample)
+	print(str(package_count) + ' packages')
+	print(str(len(resources)) + ' files')
+	
+	# Make datafiles csv file.
+	fieldnames = ['id', 'url', 'package_title', 'file_description', 'format', 'publisher_id', 'publisher_name', 'period_start', 'period_end', 'period_length', 'theme_primary']
+	print('Make ' + csvfile + '...')
+	make_csv(csvfile, fieldnames, resources)
+
+def make_datafiles_csv(csvfile):
+	"""Make datafiles csv file."""
 	# Get results from http://data.gov.uk/.
 	url_base = 'http://data.gov.uk/api/'
 	print('Get results for q=spend...')
@@ -216,12 +303,18 @@ def make_datafiles_csv():
 	print(str(package_count) + ' packages')
 	print(str(len(resources)) + ' files')
 	
-	# Make datafiles.csv.
+	# Make datafiles csv file.
 	fieldnames = ['id', 'url', 'package_title', 'file_description', 'format', 'publisher_id', 'publisher_name', 'period_start', 'period_end', 'period_length', 'theme_primary']
-	print('Make datafiles.csv...')
-	make_csv('../datafiles.csv', fieldnames, resources)
+	print('Make ' + csvfile + '...')
+	make_csv(csvfile, fieldnames, resources)
 
-make_datafiles_csv()
+# Scrape a sample.
+make_publishers_csv_sample('publishers-sample.csv')
+make_datafiles_csv_sample('datafiles-sample.csv')
+
+# Scrape all data.
+#make_publishers_csv('../publishers.csv')
+#make_datafiles_csv('../datafiles.csv')
+
 print('Done')
-
 

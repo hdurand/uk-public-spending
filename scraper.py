@@ -73,8 +73,7 @@ def get_sample_organizations():
 	url = 'http://data.gov.uk/api/3/action/organization_list'
 	print('Get list of organizations...')
 	organization_list = import_dataset(url)
-	print('Sleep 6s...')
-	time.sleep(6)
+	time.sleep(0.3)
 	
 	# Get data for each organization.
 	publishers = []
@@ -82,8 +81,7 @@ def get_sample_organizations():
 	sample = organization_list[0:30]
 	for organization in sample:
 		organization_data = get_organization_data(organization)
-		print('Sleep 6s...')
-		time.sleep(6)
+		time.sleep(0.3)
 		publishers.append(organization_data)
 	print(str(len(sample)) + ' publishers')
 	
@@ -95,16 +93,14 @@ def get_all_organizations():
 	url = 'http://data.gov.uk/api/3/action/organization_list'
 	print('Get list of organizations...')
 	organization_list = import_dataset(url)
-	print('Sleep 6s...')
-	time.sleep(6)
+	time.sleep(0.3)
 	
 	# Get data for each organization.
 	publishers = []
 	print('Get organizations data...')
 	for organization in organization_list:
 		organization_data = get_organization_data(organization)
-		print('Sleep 6s...')
-		time.sleep(6)
+		time.sleep(0.3)
 		publishers.append(organization_data)
 	print(str(len(organization_list)) + ' publishers')
 	
@@ -150,8 +146,7 @@ def get_results(url_base, query):
 	url_count = url_base + 'search/package?q=' + query
 	print('Get number of results...')
 	count = get_count(url_count)
-	print('Sleep 6s...')
-	time.sleep(6)
+	time.sleep(0.3)
 	
 	# Get the number of pages.
 	print('Get number of pages...')
@@ -163,8 +158,7 @@ def get_results(url_base, query):
 	for i in range(0, pages):
 		url = url_base + 'action/package_search?q=' + query + '&rows=100000&start=' + str(i * 1000)
 		result = import_dataset(url)
-		print('Sleep 20s...')
-		time.sleep(20)
+		time.sleep(0.3)
 		results.append(result['results'])
 		
 	return results
@@ -309,12 +303,12 @@ def make_datafiles_csv(csvfile):
 	make_csv(csvfile, fieldnames, resources)
 
 # Scrape a sample.
-make_publishers_csv_sample('publishers-sample.csv')
-make_datafiles_csv_sample('datafiles-sample.csv')
+make_publishers_csv_sample('data/publishers-sample.csv')
+make_datafiles_csv_sample('data/datafiles-sample.csv')
 
 # Scrape all data.
-#make_publishers_csv('../publishers.csv')
-#make_datafiles_csv('../datafiles.csv')
+#make_publishers_csv('data/publishers.csv')
+#make_datafiles_csv('data/datafiles.csv')
 
 print('Done')
 

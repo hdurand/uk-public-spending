@@ -1,0 +1,107 @@
+{
+	"name": "uk-public-spending",
+	"title": "UK public spending files from data.gov.uk",
+	"sources": [{
+		"name": "data.gov.uk",
+		"web": "http://data.gov.uk/"
+	}],
+	"licenses": [{
+		"type": "OGL-UK-3.0",
+		"url": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+		"name": "Open Government Licence 3.0 (United Kingdom)"
+	}],
+	"resources": [
+		{
+			"name": "publishers",
+			"path": "data/publishers-sample.csv",
+			"format": "csv",
+			"mediatype": "text/csv",
+			"schema": {
+				"fields": [
+					{
+						"name": "id",
+						"type": "string"
+					},
+					{
+						"name": "name",
+						"type": "string"
+					},
+					{
+						"name": "title",
+						"type": "string"
+					},
+					{
+						"name": "type",
+						"type": "string"
+					},
+					{
+						"name": "parent",
+						"type": "string"
+					},
+					{
+						"name": "homepage",
+						"type": "string"
+					},
+					{
+						"name": "homepage_for_data",
+						"type": "string"
+					}
+				]
+			}
+		},
+		{
+			"name": "datafiles",
+			"path": "data/datafiles-sample.csv",
+			"format": "csv",
+			"mediatype": "text/csv",
+			"schema": {
+				"fields": [
+					{
+						"name": "id",
+						"type": "string"
+					},
+					{
+						"name": "url",
+						"type": "string"
+					},
+					{
+						"name": "package_title",
+						"type": "string"
+					},
+					{
+						"name": "file_description",
+						"type": "string"
+					},
+					{
+						"name": "format",
+						"type": "string"
+					},
+					{
+						"name": "publisher_id",
+						"type": "string"
+					},
+					{
+						"name": "publisher_name",
+						"type": "string"
+					},
+					{
+						"name": "period_start",
+						"type": "string"
+					},
+					{
+						"name": "period_end",
+						"type": "string"
+					},
+					{
+						"name": "period_length",
+						"type": "string"
+					},
+					{
+						"name": "theme_primary",
+						"type": "string"
+					}
+				]
+			}
+		}
+	]
+}

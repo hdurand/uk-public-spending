@@ -20,6 +20,7 @@ def import_dataset(url):
 
 	"""
 	# Make the HTTP request.
+	print('HTTP request: ' + url + '...')
 	response = urllib2.urlopen(url)
 	assert response.code == 200
 
@@ -78,6 +79,7 @@ def get_count(url):
 
 	"""
 	# Make the HTTP request.
+	print('HTTP request: ' + url + '...')
 	response = urllib2.urlopen(url)
 	assert response.code == 200
 	
@@ -108,17 +110,23 @@ def get_results(url_base, query):
 	"""
 	# Get the number of results.
 	url_count = url_base + 'search/package?q=' + query
+	print('Get number of results...')
 	count = get_count(url_count)
+	print('Sleep 6s...')
+	time.sleep(6)
 	
 	# Get the number of pages.
+	print('Get number of pages...')
 	pages = get_number_pages(count)
 	
 	# Get the results.
+	print('Get results...')
 	results = []
 	for i in range(0, pages):
 		url = url_base + 'action/package_search?q=' + query + '&rows=100000&start=' + str(i * 1000)
 		#print(url)
 		result = import_dataset(url)
+		print('Sleep 20s...')
 		time.sleep(20)
 		results.append(result['results'])
 		
@@ -134,36 +142,37 @@ def get_datafiles(package):
 	datafiles = []
 	
 	# For each datafile, get the data.
-	for resource in package['resources']:
-		datafile = {'id': '', 'url': '', 'package_title': '', 'file_description': '', 'format': '', 'publisher_id': '', 'publisher_name': '', 'period_start': '', 'period_end': '', 'period_length': '', 'theme_primary': ''}
-		if 'id' in resource:
-			datafile['id'] = resource['id']
-		if 'url' in resource:
-			datafile['url'] = resource['url']
-		if 'description' in resource:
-			datafile['file_description'] = resource['description']
-		if 'format' in resource:
-			if resource['format'] == '' and 'mimetype' in resource:
-				datafile['format'] = resource['mimetype']
-			else:
-				datafile['format'] = resource['format']
-		if 'title' in package:
-			datafile['package_title'] = package['title']
-		if 'temporal_coverage-from' in package:
-			datafile['period_start'] = package['temporal_coverage-from']
-		if 'temporal_coverage-to' in package:
-			datafile['period_end'] = package['temporal_coverage-to']
-		if 'temporal_granularity' in package:
-			datafile['period_length'] = package['temporal_granularity']
-		if 'theme-primary' in package:
-			datafile['theme_primary'] = package['theme-primary']
-		if 'organization' in package:
-			if 'id' in package['organization']:
-				datafile['publisher_id'] = package['organization']['id']
-			if 'name' in package['organization']:
-				datafile['publisher_name'] = package['organization']['name']
-		# Store each datafile in datafiles.
-		datafiles.append(datafile)
+	if 'resources' in package:
+		for resource in package['resources']:
+			datafile = {'id': '', 'url': '', 'package_title': '', 'file_description': '', 'format': '', 'publisher_id': '', 'publisher_name': '', 'period_start': '', 'period_end': '', 'period_length': '', 'theme_primary': ''}
+			if 'id' in resource:
+				datafile['id'] = resource['id']
+			if 'url' in resource:
+				datafile['url'] = resource['url']
+			if 'description' in resource:
+				datafile['file_description'] = resource['description']
+			if 'format' in resource:
+				if resource['format'] == '' and 'mimetype' in resource:
+					datafile['format'] = resource['mimetype']
+				else:
+					datafile['format'] = resource['format']
+			if 'title' in package:
+				datafile['package_title'] = package['title']
+			if 'temporal_coverage-from' in package:
+				datafile['period_start'] = package['temporal_coverage-from']
+			if 'temporal_coverage-to' in package:
+				datafile['period_end'] = package['temporal_coverage-to']
+			if 'temporal_granularity' in package:
+				datafile['period_length'] = package['temporal_granularity']
+			if 'theme-primary' in package:
+				datafile['theme_primary'] = package['theme-primary']
+			if 'organization' in package:
+				if 'id' in package['organization']:
+					datafile['publisher_id'] = package['organization']['id']
+				if 'name' in package['organization']:
+					datafile['publisher_name'] = package['organization']['name']
+			# Store each datafile in datafiles.
+			datafiles.append(datafile)
 		
 	return datafiles
 
@@ -182,6 +191,37 @@ def make_csv(csvfile, fieldnames, dataset):
 		for datafile in dataset:
 			writer.writerow(datafile)
 
+def make_datafiles_csv():
+	"""Make datafiles.csv."""
+	# Get results from http://data.gov.uk/.
+	url_base = 'http://data.gov.uk/api/'
+	print('Get results for q=spend...')
+	results = get_results(url_base, 'spend')
+	
+	# Get datafiles from results.
+	resources = []
+	package_count = 0
+	print('Get datafiles...')
+	for page in results:
+		for package in page:
+			datafiles = []
+			if 'unpublished' in package:
+				if package['unpublished'] != 'true':
+					datafiles = get_datafiles(package)
+					resources += datafiles
+			else:
+				datafiles = get_datafiles(package)
+				resources += datafiles
+		package_count += len(page)
+	print(str(package_count) + ' packages')
+	print(str(len(resources)) + ' files')
+	
+	# Make datafiles.csv.
+	fieldnames = ['id', 'url', 'package_title', 'file_description', 'format', 'publisher_id', 'publisher_name', 'period_start', 'period_end', 'period_length', 'theme_primary']
+	print('Make datafiles.csv...')
+	make_csv('../datafiles.csv', fieldnames, resources)
 
+make_datafiles_csv()
+print('Done')
 
 

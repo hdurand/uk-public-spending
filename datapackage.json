@@ -93,7 +93,7 @@
 						"type": "string"
 					},
 					{
-						"name": "period_length",
+						"name": "period_granularity",
 						"type": "string"
 					},
 					{

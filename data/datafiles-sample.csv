@@ -1,4 +1,4 @@
-id,url,package_title,file_description,format,publisher_id,publisher_name,period_start,period_end,period_length,theme_primary
+id,url,package_title,file_description,format,publisher_id,publisher_name,period_start,period_end,period_granularity,theme_primary
 cdcaca02-98c1-40bc-953d-ed9f860c1bb8,http://opendata.s3.amazonaws.com/finance/spending-allocations-2010-2011.csv,Spending Allocations,Spending allocations for 2010/2011,CSV,d615a457-c8a6-4474-9974-02171a5de623,warwickshire-county-council,,,year,Government Spending
 c42efbf1-193c-44c5-856c-8904477e6b26,http://opendata.s3.amazonaws.com/finance/spending-allocations-2010-2011.xls,Spending Allocations,Spending allocations for 2010/2011,XLS,d615a457-c8a6-4474-9974-02171a5de623,warwickshire-county-council,,,year,Government Spending
 0a4f6f55-06c8-4ed4-8946-5f24e48e1aa8,http://www.ons.gov.uk/ons/dcp19975_154147.xml,Family Spending,2000 Edition,text/html,d5b50862-3f2a-4b7b-ad85-841b6def43be,office-for-national-statistics,,,,Society

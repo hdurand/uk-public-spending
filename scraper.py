@@ -31,29 +31,30 @@ def import_dataset(url):
 	result = response_dict['result']
 	
 	return result
-
+	
 def get_organization_data(organization):
 	"""Return dict of organization data from a CKAN dataset.
 
 	Parameters:
-	organization (str): name of the organization
+	organization (dict): CKAN organization
 
 	"""
-	# Import dataset.
-	url = 'http://data.gov.uk/api/3/action/organization_show?id=' + organization
-	organization_data = import_dataset(url)
-	
 	# Get the data.
 	publisher = {'id': '', 'name': '', 'title': '', 'type': '', 'parent': '', 'homepage': '', 'homepage_for_data': ''}
-	publisher['name'] = organization
-	if 'id' in organization_data:
-		publisher['id'] = organization_data['id']
-	if 'title' in organization_data:
-		publisher['title'] = organization_data['title']
-	if 'category' in organization_data:
-		publisher['type'] = organization_data['category']
-	if 'groups' in organization_data:
-		groups = organization_data['groups']
+	if 'id' in organization:
+		publisher['id'] = organization['id']
+	if 'name' in organization:
+		publisher['name'] = organization['name']
+	if 'title' in organization:
+		publisher['title'] = organization['title']
+	if 'extras' in organization:
+		for extra in organization['extras']:
+			if 'key' in extra and 'value' in extra:
+				if extra['key'] == 'category':
+					publisher['type'] = extra['value']
+					break
+	if 'groups' in organization:
+		groups = organization['groups']
 		parent = ''
 		for elt in groups:
 			if 'name' in elt:
@@ -62,16 +63,17 @@ def get_organization_data(organization):
 				else:
 					parent += ' + ' + elt['name']
 		publisher['parent'] = parent
-	publisher['homepage'] = 'http://data.gov.uk/publisher/' + organization
-	publisher['homepage_for_data'] = 'http://data.gov.uk/data/search?q=spend&unpublished=false&publisher=' + organization
+	if publisher['name']:
+		publisher['homepage'] = 'http://data.gov.uk/publisher/' + publisher['name']
+		publisher['homepage_for_data'] = 'http://data.gov.uk/data/search?q=spend&unpublished=false&publisher=' + publisher['name']
 	
 	return publisher
-
-def get_sample_organizations():
+	
+def get_sample_organizations(url_base):
 	"""Return sample list of publishers."""
-	# Get list of organizations.
-	url = 'http://data.gov.uk/api/3/action/organization_list'
-	print('Get list of organizations...')
+	# Get organizations.
+	url = url_base + '3/action/organization_list?all_fields=True&include_groups=True&include_extras=True'
+	print('Get organizations...')
 	organization_list = import_dataset(url)
 	time.sleep(0.3)
 	
@@ -81,17 +83,16 @@ def get_sample_organizations():
 	sample = organization_list[0:30]
 	for organization in sample:
 		organization_data = get_organization_data(organization)
-		time.sleep(0.3)
 		publishers.append(organization_data)
 	print(str(len(sample)) + ' publishers')
 	
 	return publishers
 
-def get_all_organizations():
+def get_all_organizations(url_base):
 	"""Return list of publishers."""
-	# Get list of organizations.
-	url = 'http://data.gov.uk/api/3/action/organization_list'
-	print('Get list of organizations...')
+	# Get organizations.
+	url = url_base + '3/action/organization_list?all_fields=True&include_groups=True&include_extras=True'
+	print('Get organizations...')
 	organization_list = import_dataset(url)
 	time.sleep(0.3)
 	
@@ -100,7 +101,6 @@ def get_all_organizations():
 	print('Get organizations data...')
 	for organization in organization_list:
 		organization_data = get_organization_data(organization)
-		time.sleep(0.3)
 		publishers.append(organization_data)
 	print(str(len(organization_list)) + ' publishers')
 	
@@ -175,7 +175,7 @@ def get_datafiles(package):
 	# For each datafile, get the data.
 	if 'resources' in package:
 		for resource in package['resources']:
-			datafile = {'id': '', 'url': '', 'package_title': '', 'file_description': '', 'format': '', 'publisher_id': '', 'publisher_name': '', 'period_start': '', 'period_end': '', 'period_length': '', 'theme_primary': ''}
+			datafile = {'id': '', 'url': '', 'package_title': '', 'file_description': '', 'format': '', 'publisher_id': '', 'publisher_name': '', 'period_start': '', 'period_end': '', 'period_granularity': '', 'theme_primary': ''}
 			if 'id' in resource:
 				datafile['id'] = resource['id']
 			if 'url' in resource:
@@ -194,7 +194,7 @@ def get_datafiles(package):
 			if 'temporal_coverage-to' in package:
 				datafile['period_end'] = package['temporal_coverage-to']
 			if 'temporal_granularity' in package:
-				datafile['period_length'] = package['temporal_granularity']
+				datafile['period_granularity'] = package['temporal_granularity']
 			if 'theme-primary' in package:
 				datafile['theme_primary'] = package['theme-primary']
 			if 'organization' in package:
@@ -221,11 +221,11 @@ def make_csv(csvfile, fieldnames, dataset):
 		writer.writeheader()
 		for element in dataset:
 			writer.writerow(element)
-
+	
 def make_publishers_csv_sample(csvfile):
 	"""Make sample publishers csv file."""
 	# Get organizations data
-	publishers = get_sample_organizations()
+	publishers = get_sample_organizations('http://data.gov.uk/api/')
 	
 	# Make publishers csv file.
 	fieldnames = ['id', 'name', 'title', 'type', 'parent', 'homepage', 'homepage_for_data']
@@ -235,7 +235,7 @@ def make_publishers_csv_sample(csvfile):
 def make_publishers_csv(csvfile):
 	"""Make publishers csv file."""
 	# Get organizations data
-	publishers = get_all_organizations()
+	publishers = get_all_organizations('http://data.gov.uk/api/')
 	
 	# Make publishers csv file.
 	fieldnames = ['id', 'name', 'title', 'type', 'parent', 'homepage', 'homepage_for_data']
@@ -268,7 +268,7 @@ def make_datafiles_csv_sample(csvfile):
 	print(str(len(resources)) + ' files')
 	
 	# Make datafiles csv file.
-	fieldnames = ['id', 'url', 'package_title', 'file_description', 'format', 'publisher_id', 'publisher_name', 'period_start', 'period_end', 'period_length', 'theme_primary']
+	fieldnames = ['id', 'url', 'package_title', 'file_description', 'format', 'publisher_id', 'publisher_name', 'period_start', 'period_end', 'period_granularity', 'theme_primary']
 	print('Make ' + csvfile + '...')
 	make_csv(csvfile, fieldnames, resources)
 
@@ -298,7 +298,7 @@ def make_datafiles_csv(csvfile):
 	print(str(len(resources)) + ' files')
 	
 	# Make datafiles csv file.
-	fieldnames = ['id', 'url', 'package_title', 'file_description', 'format', 'publisher_id', 'publisher_name', 'period_start', 'period_end', 'period_length', 'theme_primary']
+	fieldnames = ['id', 'url', 'package_title', 'file_description', 'format', 'publisher_id', 'publisher_name', 'period_start', 'period_end', 'period_granularity', 'theme_primary']
 	print('Make ' + csvfile + '...')
 	make_csv(csvfile, fieldnames, resources)
 

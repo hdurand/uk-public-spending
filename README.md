@@ -15,6 +15,8 @@ See data.gov.uk [Terms and conditions] (http://data.gov.uk/terms-and-conditions)
 
 See data.gov.uk [API] (https://datagovuk.github.io/guidance/api.html) for more information about the API.
 
+**Update:** `scraper.py` now makes only one HTTP request to scrape all publishers data (stored in `data/publishers-sample.csv`).
+
 #### Data
 
 `data/publishers-sample.csv`: sample of data.gov.uk publishers.

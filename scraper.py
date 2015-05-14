@@ -176,33 +176,32 @@ def get_datafiles(package):
 	# For each datafile, get the data.
 	if 'resources' in package:
 		for resource in package['resources']:
-			datafile = {'id': '', 'url': '', 'package_title': '', 'file_description': '', 'format': '', 'publisher_id': '', 'publisher_name': '', 'period_start': '', 'period_end': '', 'period_granularity': '', 'theme_primary': ''}
+			datafile = {'id': '', 'publisher_id': '', 'title': '', 'url': '', 'format': '', 'last_modified': '', 'period': ''}
 			if 'id' in resource:
 				datafile['id'] = resource['id']
 			if 'url' in resource:
 				datafile['url'] = resource['url']
-			if 'description' in resource:
-				datafile['file_description'] = resource['description']
 			if 'format' in resource:
-				if resource['format'] == '' and 'mimetype' in resource:
-					datafile['format'] = resource['mimetype']
-				else:
-					datafile['format'] = resource['format']
+				datafile['format'] = resource['format']
+			if 'last_modified' in resource:
+				datafile['last_modified'] = resource['last_modified']
+			if 'date' in resource:
+				datafile['period'] = resource['date']
+
+			title = ''
 			if 'title' in package:
-				datafile['package_title'] = package['title']
-			if 'temporal_coverage-from' in package:
-				datafile['period_start'] = package['temporal_coverage-from']
-			if 'temporal_coverage-to' in package:
-				datafile['period_end'] = package['temporal_coverage-to']
-			if 'temporal_granularity' in package:
-				datafile['period_granularity'] = package['temporal_granularity']
-			if 'theme-primary' in package:
-				datafile['theme_primary'] = package['theme-primary']
+				title += package['title']
+			if 'description' in resource:
+				if title:
+					title += ' / ' + resource['description']
+				else:
+					title += resource['description']
+			datafile['title'] = title
+			
 			if 'organization' in package:
-				if 'id' in package['organization']:
-					datafile['publisher_id'] = package['organization']['id']
 				if 'name' in package['organization']:
-					datafile['publisher_name'] = package['organization']['name']
+					datafile['publisher_id'] = package['organization']['name']
+			
 			# Store each datafile in datafiles.
 			datafiles.append(datafile)
 		
@@ -269,7 +268,7 @@ def make_datafiles_csv_sample(csvfile):
 	print(str(len(resources)) + ' files')
 	
 	# Make datafiles csv file.
-	fieldnames = ['id', 'url', 'package_title', 'file_description', 'format', 'publisher_id', 'publisher_name', 'period_start', 'period_end', 'period_granularity', 'theme_primary']
+	fieldnames = ['id', 'publisher_id', 'title', 'url', 'format', 'last_modified', 'period']
 	print('Make ' + csvfile + '...')
 	make_csv(csvfile, fieldnames, resources)
 
@@ -299,7 +298,7 @@ def make_datafiles_csv(csvfile):
 	print(str(len(resources)) + ' files')
 	
 	# Make datafiles csv file.
-	fieldnames = ['id', 'url', 'package_title', 'file_description', 'format', 'publisher_id', 'publisher_name', 'period_start', 'period_end', 'period_granularity', 'theme_primary']
+	fieldnames = ['id', 'publisher_id', 'title', 'url', 'format', 'last_modified', 'period']
 	print('Make ' + csvfile + '...')
 	make_csv(csvfile, fieldnames, resources)
 

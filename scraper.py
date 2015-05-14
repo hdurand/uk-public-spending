@@ -40,11 +40,9 @@ def get_organization_data(organization):
 
 	"""
 	# Get the data.
-	publisher = {'id': '', 'name': '', 'title': '', 'type': '', 'parent': '', 'homepage': '', 'homepage_for_data': ''}
-	if 'id' in organization:
-		publisher['id'] = organization['id']
+	publisher = {'id': '', 'title': '', 'type': '', 'homepage': '', 'homepage_for_data': '', 'contact': '', 'email': '', 'parent_id': ''}
 	if 'name' in organization:
-		publisher['name'] = organization['name']
+		publisher['id'] = organization['name']
 	if 'title' in organization:
 		publisher['title'] = organization['title']
 	if 'extras' in organization:
@@ -52,7 +50,10 @@ def get_organization_data(organization):
 			if 'key' in extra and 'value' in extra:
 				if extra['key'] == 'category':
 					publisher['type'] = extra['value']
-					break
+				elif extra['key'] == 'contact-name':
+					publisher['contact'] = extra['value']
+				elif extra['key'] == 'contact-email':
+					publisher['email'] = extra['value']
 	if 'groups' in organization:
 		groups = organization['groups']
 		parent = ''
@@ -62,10 +63,10 @@ def get_organization_data(organization):
 					parent += elt['name']
 				else:
 					parent += ' + ' + elt['name']
-		publisher['parent'] = parent
-	if publisher['name']:
-		publisher['homepage'] = 'http://data.gov.uk/publisher/' + publisher['name']
-		publisher['homepage_for_data'] = 'http://data.gov.uk/data/search?q=spend&unpublished=false&publisher=' + publisher['name']
+		publisher['parent_id'] = parent
+	if publisher['id']:
+		publisher['homepage'] = 'http://data.gov.uk/publisher/' + publisher['id']
+		publisher['homepage_for_data'] = 'http://data.gov.uk/data/search?q=spend&unpublished=false&publisher=' + publisher['id']
 	
 	return publisher
 	
@@ -228,7 +229,7 @@ def make_publishers_csv_sample(csvfile):
 	publishers = get_sample_organizations('http://data.gov.uk/api/')
 	
 	# Make publishers csv file.
-	fieldnames = ['id', 'name', 'title', 'type', 'parent', 'homepage', 'homepage_for_data']
+	fieldnames = ['id', 'title', 'type', 'homepage', 'homepage_for_data', 'contact', 'email', 'parent_id']
 	print('Make ' + csvfile + '...')
 	make_csv(csvfile, fieldnames, publishers)
 
@@ -238,7 +239,7 @@ def make_publishers_csv(csvfile):
 	publishers = get_all_organizations('http://data.gov.uk/api/')
 	
 	# Make publishers csv file.
-	fieldnames = ['id', 'name', 'title', 'type', 'parent', 'homepage', 'homepage_for_data']
+	fieldnames = ['id', 'title', 'type', 'homepage', 'homepage_for_data', 'contact', 'email', 'parent_id']
 	print('Make ' + csvfile + '...')
 	make_csv(csvfile, fieldnames, publishers)
 

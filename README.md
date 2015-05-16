@@ -3,7 +3,10 @@ uk-public-spending
 
 #### Scraper
 
-`scraper.py` scrapes public spending data from [data.gov.uk] (http://data.gov.uk/).
+`scraper.py` scrapes public spending data from [data.gov.uk] (http://data.gov.uk/) (spend over £25,000 for departments and spend over £500 for local governments).
+
+`scraper.py` searches packages of files that satisfy the search criteria "spend*" or "spent" or "expenditure" from [data.gov.uk] (http://data.gov.uk/).
+Then, it keeps files with 500 or 25000 (written in any way) in the package title, the package name, the package description (notes), or the file description.
 
 Traffic limits on data.gov.uk:
 + no concurrency
@@ -15,8 +18,6 @@ See data.gov.uk [Terms and conditions] (http://data.gov.uk/terms-and-conditions)
 
 See data.gov.uk [API] (https://datagovuk.github.io/guidance/api.html) for more information about the API.
 
-**Update:** `scraper.py` now makes only one HTTP request to scrape all publishers data (stored in `data/publishers-sample.csv`).
-
 #### Data
 
 `data/publishers-sample.csv`: sample of data.gov.uk publishers.
@@ -24,14 +25,6 @@ See data.gov.uk [API] (https://datagovuk.github.io/guidance/api.html) for more i
 `data/datafiles-sample.csv`: sample of data.gov.uk spending files.
 
 See `datapackage.json` and [Tabular Data Packages] (http://data.okfn.org/doc/tabular-data-package) for more information.
-
-#### To do
-
-+ Scraped spending files are those that satisfy the search criteria "spend". Is there any other search criteria to use?
-
-+ As a result, some scraped files are not public spending files. For example, the Office for National Statistics publishes Family Spending files. Those files satisfy the search criteria "spend" but are not public spending files. Is there a way to exclude those files?
-
-+ The number of scraped publishers from the [API] (http://data.gov.uk/api/3/action/organization_list) is slightly lower than the number of publishers according to the [web interface] (http://data.gov.uk/publisher): 1326 vs. 1331. Why?
 
 #### License
 

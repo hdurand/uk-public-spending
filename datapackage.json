@@ -34,18 +34,18 @@
 						"name": "homepage",
 						"type": "string"
 					},
-                    {
-                        "name": "contact",
-                        "type": "string"
-                    },
-                    {
-                        "name": "email",
-                        "type": "string"
-                    },
-                    {
-                        "name": "parent_id",
-                        "type": "string"
-                    }
+					{
+						"name": "contact",
+						"type": "string"
+					},
+					{
+						"name": "email",
+						"type": "string"
+					},
+					{
+						"name": "parent_id",
+						"type": "string"
+					}
 				]
 			}
 		},
@@ -72,18 +72,18 @@
 						"name": "url",
 						"type": "string"
 					},
-                    {
-                        "name": "format",
-                        "type": "string"
-                    },
-                    {
-                        "name": "last_modified",
-                        "type": "string"
-                    },
-                    {
-                        "name": "period",
-                        "type": "string"
-                    }
+					{
+						"name": "format",
+						"type": "string"
+					},
+					{
+						"name": "last_modified",
+						"type": "string"
+					},
+					{
+						"name": "period",
+						"type": "string"
+					}
 				]
 			}
 		}

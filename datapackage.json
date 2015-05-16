@@ -23,10 +23,6 @@
 						"type": "string"
 					},
 					{
-						"name": "name",
-						"type": "string"
-					},
-					{
 						"name": "title",
 						"type": "string"
 					},
@@ -35,17 +31,21 @@
 						"type": "string"
 					},
 					{
-						"name": "parent",
-						"type": "string"
-					},
-					{
 						"name": "homepage",
 						"type": "string"
 					},
-					{
-						"name": "homepage_for_data",
-						"type": "string"
-					}
+                    {
+                        "name": "contact",
+                        "type": "string"
+                    },
+                    {
+                        "name": "email",
+                        "type": "string"
+                    },
+                    {
+                        "name": "parent_id",
+                        "type": "string"
+                    }
 				]
 			}
 		},
@@ -61,45 +61,29 @@
 						"type": "string"
 					},
 					{
-						"name": "url",
-						"type": "string"
-					},
-					{
-						"name": "package_title",
-						"type": "string"
-					},
-					{
-						"name": "file_description",
-						"type": "string"
-					},
-					{
-						"name": "format",
-						"type": "string"
-					},
-					{
 						"name": "publisher_id",
 						"type": "string"
 					},
 					{
-						"name": "publisher_name",
+						"name": "title",
 						"type": "string"
 					},
 					{
-						"name": "period_start",
+						"name": "url",
 						"type": "string"
 					},
-					{
-						"name": "period_end",
-						"type": "string"
-					},
-					{
-						"name": "period_granularity",
-						"type": "string"
-					},
-					{
-						"name": "theme_primary",
-						"type": "string"
-					}
+                    {
+                        "name": "format",
+                        "type": "string"
+                    },
+                    {
+                        "name": "last_modified",
+                        "type": "string"
+                    },
+                    {
+                        "name": "period",
+                        "type": "string"
+                    }
 				]
 			}
 		}
